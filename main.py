@@ -54,6 +54,15 @@ def main():
     with open(path, "wb") as handle:
         handle.write(data)
     os.chmod(path, 0o644)
+    with open(path, "rb") as handle:
+        written = handle.read()
+    if written != data:
+        raise SystemExit("entry.txt read-back mismatch")
+    decoded = written.decode("utf-8")
+    if decoded != text or "\n" in decoded or "\r" in decoded:
+        raise SystemExit("entry.txt is not a single clean line")
+    if any(ord(ch) < 0x20 for ch in decoded):
+        raise SystemExit("entry.txt contains a control character")
 
 
 if __name__ == "__main__":
